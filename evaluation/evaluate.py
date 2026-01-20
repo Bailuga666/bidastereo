@@ -24,6 +24,7 @@ from bidastereo.models.core.model_zoo import (
     model_zoo,
 )
 from pytorch3d.implicitron.tools.config import get_default_args_field
+
 from bidastereo.evaluation.core.evaluator import Evaluator
 
 
@@ -97,7 +98,9 @@ def run_eval(cfg: DefaultConfig):
         # for real_sequence_name in ["teddy_static", "ignacio_waving", "nikita_reading"]:
         for real_sequence_name in ["nikita_reading"]:
             ds_path = f"./dynamic_replica_data/real/{real_sequence_name}"
-            seq_len_real = 83
+            # set seq_len_real
+            seq_len_real = 30
+            # baiyang 83-》81-》10
             real_dataset = datasets.DynamicReplicaDataset(
                 split="test",
                 sample_len=seq_len_real,
@@ -110,6 +113,9 @@ def run_eval(cfg: DefaultConfig):
                 test_dataloader=real_dataset,
                 is_real_data=True,
                 train_mode=False,
+                
+                exp_dir=cfg.exp_dir,
+                # baiyang 添加 exp_dir 参数
             )
         return
 

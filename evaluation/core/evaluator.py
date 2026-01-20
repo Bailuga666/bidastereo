@@ -57,6 +57,8 @@ class Evaluator(Configurable):
             os.makedirs(self.visualize_dir, exist_ok=True)
 
         for batch_idx, sequence in enumerate(tqdm(test_dataloader)):
+            sequence_name = sequence["metadata"][0][0][0]
+            # baiyang 添加名字
             batch_dict = defaultdict(list)
             batch_dict["stereo_video"] = sequence["img"]
             if not is_real_data:
@@ -88,6 +90,13 @@ class Evaluator(Configurable):
 
             assert "disparity" in predictions
             predictions["disparity"] = predictions["disparity"][:, :1].clone().cpu()
+
+            # 保存深度数据
+            disparity = predictions['disparity']
+            # 计算depth（简单近似，实际需要scale）
+            depth = 1.0 / (disparity + 1e-6)  # 避免除零
+            np.save(os.path.join(exp_dir, f'depth_{sequence_name}_{batch_idx}.npy'), depth.cpu().numpy())
+            # baiyang 添加保存深度数据
 
             if not is_real_data:
                 predictions["disparity"] = predictions["disparity"] * (

@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 # # Data loading based on https://github.com/NVIDIA/flownet2-pytorch
-
+# cuda 11.3 Python 3.8 PyTorch 1.12.1 这就是我的环境
 
 import os
 import copy
