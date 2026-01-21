@@ -41,3 +41,6 @@ Thumbs.db
 # Outputs
 outputs/
 dynamic_replica_data/
+
+# Local synthetic data / temporary
+my_data/
