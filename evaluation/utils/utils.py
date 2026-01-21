@@ -277,7 +277,11 @@ def visualize_batch(
         )
         R, T, cam_ = pcd_global_seq[ref_frame][2]
 
-        median_depth = preds.depth_map.median()
+        finite_depth = torch.isfinite(preds.depth_map)
+        if finite_depth.any():
+            median_depth = preds.depth_map[finite_depth].median()
+        else:
+            median_depth = torch.tensor(1.0, device=device)
         cam_.cuda()
 
         for mode in ["angle_15", "angle_-15", "changing_angle"]:
@@ -313,11 +317,30 @@ def visualize_batch(
                     rasterizer=rasterizer,
                     compositor=AlphaCompositor(background_color=(1, 1, 1)),
                 )
-                pcd_copy = pcd.clone()
+                
+                pcd_copy = pcd.clone().to(device)
+                color_copy = color.clone().to(device)
 
-                point_cloud = Pointclouds(points=[pcd_copy], features=[color / 255.0])
+                valid = torch.isfinite(pcd_copy).all(dim=1)
+                if valid.sum() == 0:
+                    continue
+                pcd_copy = pcd_copy[valid]
+                color_copy = color_copy[valid]
+
+                point_cloud = Pointclouds(
+                    points=[pcd_copy],
+                    features=[color_copy.float().clamp(0, 255) / 255.0],
+                )
                 images = renderer(point_cloud)
                 res.append(images[0, ..., :3].cpu())
+            if len(res) == 0:
+                logging.warning(
+                    "No valid points for visualization in mode %s (sequence %s, step %s). Skip rendering.",
+                    mode,
+                    sequence_name,
+                    step,
+                )
+                continue
             res = torch.stack(res)
 
             video = (res * 255).numpy().astype(np.uint8)
