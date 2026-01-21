@@ -6,6 +6,8 @@
 - 在Windows搜索栏输入“wsl”或“Ubuntu”，打开WSL终端。
 - 进入项目目录：`cd /mnt/d/github_local/bidastereo`
 - 激活Conda环境：`conda activate bidastereo`
+- export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:/usr/lib/wsl/lib:$LD_LIBRARY_PATH
+- export CUDA_HOME=$CONDA_PREFIX
 - 设置PYTHONPATH：`export PYTHONPATH=$(cd ../ && pwd):$(pwd):$PYTHONPATH`
 
 ## 2. 准备伪造数据（从单目视频生成立体图像序列）

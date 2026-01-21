@@ -99,7 +99,7 @@ def run_eval(cfg: DefaultConfig):
         for real_sequence_name in ["nikita_reading"]:
             ds_path = f"./dynamic_replica_data/real/{real_sequence_name}"
             # set seq_len_real
-            seq_len_real = 30
+            seq_len_real = 20
             # baiyang 83-》81-》10
             real_dataset = datasets.DynamicReplicaDataset(
                 split="test",

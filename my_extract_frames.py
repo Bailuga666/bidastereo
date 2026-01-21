@@ -26,8 +26,8 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 print(f"视频尺寸: {width}x{height}")
 
 # 裁剪尺寸
-crop_width = 700
-crop_height = 600
+crop_width = 256
+crop_height = 256
 
 frame_count = 0
 while True:
