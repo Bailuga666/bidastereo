@@ -18,16 +18,16 @@
   - 设置裁剪尺寸：`crop_width = 500`（宽度）、`crop_height = 400`（高度）
   - 设置视差像素：`disparity_pixels = 10`（右图相对左图的像素偏移）
   - 设置帧数：默认处理视频所有帧，或在循环中加`if frame_count >= 81: break`限制帧数。
-- 运行生成图像序列：`python extract_frames.py`
+- 运行生成图像序列：`python my_extract_frames.py`
   - 输出：生成`./dynamic_replica_data/real/nikita_reading/test/images/`下的`left_000.png`、`right_000.png`等文件，尺寸500x400。
 
 ## 3. 生成注释文件、mask和虚拟深度
-- 运行生成注释：`python generate_annotations.py`
+- 运行生成注释：`python my_generate_annotations.py`
   - 自动检测图像尺寸（500x400）和帧数（从images目录）。
   - 输出：生成`./dynamic_replica_data/real/nikita_reading/test/frame_annotations_test.jgz`（注释文件），以及`depths/`和`masks/`目录下的虚拟深度和mask文件。
 
 ## 4. 验证数据形状正确
-- 运行检查脚本：`python check_shapes.py`
+- 运行检查脚本：`python my_check_shapes.py`
   - 自动检测期望尺寸（500x400），检查前5帧的图像、深度、mask尺寸一致性。
   - 如果不一致，重新生成数据。
 
@@ -38,7 +38,7 @@
   - 如果报PyTorch3D错误，确认CUDA可用。
 
 ## 6. 根据深度图序列生成深度视频
-- 运行转换脚本：`python depth_to_video.py`
+- 运行转换脚本：`python my_depth_to_video.py`
   - 自动根据`./outputs/depth_nikita_reading_0.npy`的形状生成视频，保存为`./outputs/depth_video.mp4`（尺寸500x400，帧率10fps）。
   - 用播放器打开查看深度变化视频。
 
