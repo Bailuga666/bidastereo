@@ -3,10 +3,10 @@ import os
 import numpy as np
 
 # 输入单目视频路径
-video_path = "your_mono_video.mp4"  # 改成你的单目视频路径
+video_path = "/openbayes/home/bidastereo/your_mono_video.mp4"  # 改成你的单目视频路径
 
 # 输出目录
-output_dir = "./dynamic_replica_data/real/nikita_reading/test/images"
+output_dir = "./dynamic_replica_data/real/my_data/test/images"
 os.makedirs(output_dir, exist_ok=True)
 
 # 模拟视差：右图相对于左图向右移动的像素数
@@ -35,8 +35,14 @@ while True:
     if not ret:
         break
 
-    # 裁剪左上角 crop_height x crop_width
-    frame = frame[:crop_height, :crop_width]
+    # 中心裁剪 crop_height x crop_width
+    if width < crop_width or height < crop_height:
+        raise ValueError(
+            f"视频尺寸过小: {width}x{height}, 无法裁剪 {crop_width}x{crop_height}"
+        )
+    x0 = (width - crop_width) // 2
+    y0 = (height - crop_height) // 2
+    frame = frame[y0 : y0 + crop_height, x0 : x0 + crop_width]
 
     # 左图：原帧
     left_frame = frame

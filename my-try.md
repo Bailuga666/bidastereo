@@ -43,3 +43,12 @@
   - 用播放器打开查看深度变化视频。
 
 整个流程完成后，你会得到深度预测视频。脚本已优化为自动检测参数，记得激活conda环境和设置PYTHONPATH。如果遇到问题，检查CUDA环境或重新安装依赖。
+
+
+
+
+
+python my_extract_frames.py
+python my_generate_annotations.py
+python ./evaluation/evaluate.py --config-name eval_real_data MODEL.BiDAStereoModel.model_weights=./checkpoints/bidastereo_sf_dr.pth MODEL.BiDAStereoModel.kernel_size=10 visualize_interval=-1
+python my_disp_to_depth_video.py --depth ./outputs/bidastereo_real/depth_my_data_0.npy --out ./outputs/depth_from_depth.mp4
