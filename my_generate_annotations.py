@@ -16,8 +16,8 @@ from PIL import Image
 
 annotations = []
 
-sequence_name = "my_data"  # 默认用这个名
-root_dir = "./dynamic_replica_data/real/my_data/test"
+sequence_name = "sample_045pred"  # 默认用这个名
+root_dir = "./dynamic_replica_data/real/sample_045pred/test"
 
 # 是否生成全白 mask（评测必须有 mask 文件）
 create_masks = True

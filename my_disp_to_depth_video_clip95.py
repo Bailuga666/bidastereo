@@ -57,8 +57,8 @@ def main() -> None:
         default="./outputs/depth_from_disp_clip95.mp4",
         help="Output video path",
     )
-    parser.add_argument("--lower-pct", type=float, default=5.0, help="Lower percentile for clipping (default 5)")
-    parser.add_argument("--upper-pct", type=float, default=95.0, help="Upper percentile for clipping (default 95)")
+    parser.add_argument("--lower-pct", type=float, default=1.0, help="Lower percentile for clipping (default 5)")
+    parser.add_argument("--upper-pct", type=float, default=99.0, help="Upper percentile for clipping (default 95)")
     parser.add_argument("--eps", type=float, default=1e-6, help="EPS for disparity->depth")
     args = parser.parse_args()
 
@@ -87,7 +87,8 @@ def main() -> None:
 
     for i in range(frames):
         frame = depth_u8_seq[i]
-        frame_bgr = cv2.applyColorMap(frame, cv2.COLORMAP_INFERNO)
+        # 使用 viridis_r：对灰度取反后应用 VIRIDIS 色表
+        frame_bgr = cv2.applyColorMap(255 - frame, cv2.COLORMAP_VIRIDIS)
         writer.write(frame_bgr)
 
     writer.release()
@@ -98,3 +99,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+# python my_disp_to_depth_video_clip95.py --disp ./outputs/bidastereo_real/depth_sample_045input_0.npy --out ./outputs/depth_sample_045input_clip95.mp4 --fps 10
+# python my_disp_to_depth_video_clip95.py --disp ./outputs/bidastereo_real/depth_sample_045pred_0.npy --out ./outputs/depth_sample_045pred_clip95.mp4 --fps 10
+# python my_disp_to_depth_video_clip95.py --disp ./outputs/bidastereo_real/depth_sample_050input_0.npy --out ./outputs/depth_sample_050input_clip95.mp4 --fps 10
+# python my_disp_to_depth_video_clip95.py --disp ./outputs/bidastereo_real/depth_sample_050pred_0.npy --out ./outputs/depth_sample_050pred_clip95.mp4 --fps 10

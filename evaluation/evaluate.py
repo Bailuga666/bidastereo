@@ -95,8 +95,13 @@ def run_eval(cfg: DefaultConfig):
             things_test=True,
         )
     elif cfg.dataset_name == "real":
-        # for real_sequence_name in ["teddy_static", "ignacio_waving", "nikita_reading"]:
-        for real_sequence_name in ["my_data"]:
+        # Real sequences to evaluate
+        for real_sequence_name in [
+            "sample_045input",
+            "sample_050input",
+            "sample_045pred",
+            "sample_050pred",
+        ]:
             ds_path = f"./dynamic_replica_data/real/{real_sequence_name}"
             # set seq_len_real from images
             images_dir = os.path.join(ds_path, "test", "images")
