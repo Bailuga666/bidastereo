@@ -3,7 +3,7 @@ import re
 import shutil
 from glob import glob
 # /openbayes/home/sample_045
-SRC_DIR = "/openbayes/home/sample_045"
+SRC_DIR = "/openbayes/home/sample_001"
 DST_INPUTS = os.path.join(SRC_DIR, "inputs")
 DST_PREDS = os.path.join(SRC_DIR, "preds")
 

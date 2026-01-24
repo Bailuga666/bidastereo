@@ -97,10 +97,14 @@ def run_eval(cfg: DefaultConfig):
     elif cfg.dataset_name == "real":
         # Real sequences to evaluate
         for real_sequence_name in [
-            "sample_045input",
-            "sample_050input",
-            "sample_045pred",
-            "sample_050pred",
+            # "sample_045input",
+            # "sample_050input",
+            # "sample_045pred",
+            # "sample_050pred",
+            "sample_000input",
+            "sample_001input",
+            "sample_000pred",
+            "sample_001pred",
         ]:
             ds_path = f"./dynamic_replica_data/real/{real_sequence_name}"
             # set seq_len_real from images

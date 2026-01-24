@@ -43,28 +43,39 @@ def normalize_framewise(data: np.ndarray, lower_pct: float, upper_pct: float) ->
 
 
 def main() -> None:
-	parser = argparse.ArgumentParser(description="Convert disparity npy to images")
-	parser.add_argument("--disp", type=str, required=True, help="Path to disparity npy")
-	parser.add_argument("--out-dir", type=str, required=True, help="Output directory for images")
+	parser = argparse.ArgumentParser(description="Convert disparity/depth npy to images or video")
+	parser.add_argument("--disp", type=str, default="", help="Path to disparity npy")
+	parser.add_argument("--depth", type=str, default="", help="Path to depth npy (optional, if provided, used directly)")
+	parser.add_argument("--out-dir", type=str, required=True, help="Output directory for images or video path when --video is set")
+	parser.add_argument("--video", action="store_true", help="If set, write a single video instead of images (out-dir treated as file path)")
 	parser.add_argument("--scale", type=float, default=None, help="Depth scale (optional)")
 	parser.add_argument("--eps", type=float, default=1e-6, help="EPS for disparity->depth")
-	parser.add_argument("--lower-pct", type=float, default=1.0, help="Lower percentile for normalization")
+	parser.add_argument("--lower-pct", type=float, default=1, help="Lower percentile for normalization")
 	parser.add_argument("--upper-pct", type=float, default=99.0, help="Upper percentile for normalization")
 	parser.add_argument(
 		"--cmap",
 		type=str,
-		default="viridis_r",
+		default="viridis",
 		choices=["viridis", "viridis_r", "inferno", "magma", "plasma"],
 		help="Colormap",
 	)
 	args = parser.parse_args()
 
-	disp = load_sequence_npy(args.disp)
-	depth = disparity_to_depth(disp, args.scale, eps=args.eps)
+	# load either depth or disparity
+	if args.depth:
+		if not os.path.exists(args.depth):
+			raise FileNotFoundError(args.depth)
+		depth = load_sequence_npy(args.depth)
+	elif args.disp:
+		if not os.path.exists(args.disp):
+			raise FileNotFoundError(args.disp)
+		disp = load_sequence_npy(args.disp)
+		depth = disparity_to_depth(disp, args.scale, eps=args.eps)
+	else:
+		raise ValueError("Please provide --disp or --depth")
 
+	# normalize
 	depth_u8 = normalize_framewise(depth, args.lower_pct, args.upper_pct)
-
-	os.makedirs(args.out_dir, exist_ok=True)
 
 	cmap_map = {
 		"viridis": cv2.COLORMAP_VIRIDIS,
@@ -75,19 +86,40 @@ def main() -> None:
 	}
 	cmap = cmap_map[args.cmap]
 
-	for i in range(depth_u8.shape[0]):
-		gray = depth_u8[i]
-		if args.cmap == "viridis_r":
-			gray = 255 - gray
-		color = cv2.applyColorMap(gray, cmap)
-		out_path = os.path.join(args.out_dir, f"disp_{i:03d}.png")
-		cv2.imwrite(out_path, color)
-		print(f"frame {i:03d} -> {out_path}")
+	# output images or video
+	if args.video:
+		# args.out_dir is a file path for video
+		out_file = args.out_dir
+		frames, height, width = depth_u8.shape
+		writer = cv2.VideoWriter(out_file, cv2.VideoWriter_fourcc(*"mp4v"), 10, (width, height))
+		for i in range(frames):
+			gray = depth_u8[i]
+			if args.cmap == "viridis_r":
+				gray = 255 - gray
+			color = cv2.applyColorMap(gray, cmap)
+			writer.write(color)
+		writer.release()
+		print(f"Saved video: {out_file} (frames={frames})")
+	else:
+		os.makedirs(args.out_dir, exist_ok=True)
+		for i in range(depth_u8.shape[0]):
+			gray = depth_u8[i]
+			if args.cmap == "viridis_r":
+				gray = 255 - gray
+			color = cv2.applyColorMap(gray, cmap)
+			out_path = os.path.join(args.out_dir, f"disp_{i:03d}.png")
+			cv2.imwrite(out_path, color)
+			print(f"frame {i:03d} -> {out_path}")
 
 
 if __name__ == "__main__":
 	main()
-# python my_disp_to_image.py --disp ./outputs/bidastereo_real/depth_sample_045input_0.npy --out-dir /openbayes/home/bidastereo/outputs/disp_images/depth_sample_045input_0
-# python my_disp_to_image.py --disp ./outputs/bidastereo_real/depth_sample_045pred_0.npy --out-dir /openbayes/home/bidastereo/outputs/disp_images/depth_sample_045pred_0
-# python my_disp_to_image.py --disp ./outputs/bidastereo_real/depth_sample_050input_0.npy --out-dir /openbayes/home/bidastereo/outputs/disp_images/depth_sample_050input_0
-# python my_disp_to_image.py --disp ./outputs/bidastereo_real/depth_sample_050pred_0.npy --out-dir /openbayes/home/bidastereo/outputs/disp_images/depth_sample_050pred_0
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_000pred_0.npy --out-dir ./outputs/disp_images/sample_000pred
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_001pred_0.npy --out-dir ./outputs/disp_images/sample_001pred
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_045pred_0.npy --out-dir ./outputs/disp_images/sample_045pred
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_050pred_0.npy --out-dir ./outputs/disp_images/sample_050pred
+
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_000input_0.npy --out-dir ./outputs/disp_images/sample_000input
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_001input_0.npy --out-dir ./outputs/disp_images/sample_001input
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_045input_0.npy --out-dir ./outputs/disp_images/sample_045input
+# python my_disp_to_image.py --depth ./outputs/bidastereo_real/depth_sample_050input_0.npy --out-dir ./outputs/disp_images/sample_050input
